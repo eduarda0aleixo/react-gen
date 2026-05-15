@@ -1,5 +1,8 @@
 // rfce = estrutura inicial do componente
 
+import ListaPostagens from "../../components/postagem/listapostagens/ListaPostagens";
+import ModalPostagem from "../../components/postagem/modalpostagem/ModalPostagem";
+
 export default function Home() {
   // lógica de programação do componente Home pode ser adicionada aqui
   return (
@@ -14,7 +17,7 @@ export default function Home() {
 
             <div className="flex justify-around gap-4">
               <div className="rounded text-white border-white border-2 py-2 px-4">
-                Nova Postagem
+                 <ModalPostagem />
               </div>
             </div>
           </div>
@@ -28,6 +31,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+       <ListaPostagens />
     </>
   );
 }
