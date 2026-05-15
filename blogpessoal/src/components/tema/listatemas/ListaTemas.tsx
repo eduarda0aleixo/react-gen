@@ -5,13 +5,13 @@ import { SyncLoader } from "react-spinners";
 import type Tema from "../../../models/Tema";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { buscar } from "../../../services/Service";
+import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 function ListaTemas() {
 
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
-
     const [temas, setTemas] = useState<Tema[]>([])
 
     const { usuario, handleLogout } = useContext(AuthContext)
@@ -19,7 +19,7 @@ function ListaTemas() {
 
     useEffect(() => {
         if (token === '') {
-            alert('Você precisa estar logado!')
+            ToastAlerta('Você precisa estar logado!', 'info')
             navigate('/')
         }
     }, [token])
@@ -31,13 +31,14 @@ function ListaTemas() {
     async function buscarTemas() {
         try {
             setIsLoading(true)
-
             await buscar('/temas', setTemas, {
                 headers: { Authorization: token }
             })
         } catch (error: any) {
             if (error.toString().includes('401')) {
                 handleLogout()
+            } else {
+                ToastAlerta('Erro ao buscar temas', 'erro')
             }
         } finally {
             setIsLoading(false)
@@ -48,29 +49,26 @@ function ListaTemas() {
 
     return (
         <>
-         {isLoading && (
-            <SyncLoader
-                color="#312e81"
-                size={32}
-            />
-        )}
-        <div className="flex justify-center w-full my-4">
-            <div className="container flex flex-col">
-                {(!isLoading && temas.length === 0) && (
-                    <span className="text-3xl text-center my-8">
-                        Nenhum Tema foi encontrado!
-                    </span>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {
-                        temasOrdenados.map((tema) => (
+            {isLoading && (
+                <div className="flex justify-center my-8">
+                    <SyncLoader color="#312e81" size={32} />
+                </div>
+            )}
+            <div className="flex justify-center w-full my-4">
+                <div className="container flex flex-col">
+                    {(!isLoading && temas.length === 0) && (
+                        <span className="text-3xl text-center my-8 text-gray-500">
+                            Nenhum Tema foi encontrado!
+                        </span>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {temasOrdenados.map((tema) => (
                             <CardTema key={tema.id} tema={tema}/>
-                        ))
-                    }
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
-    </>
+        </>
     )
 }
 

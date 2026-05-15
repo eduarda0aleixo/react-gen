@@ -4,6 +4,7 @@ import { ClipLoader } from "react-spinners"
 import type Tema from "../../../models/Tema"
 import { AuthContext } from "../../../contexts/AuthContext"
 import { buscar, deletar } from "../../../services/Service"
+import { ToastAlerta } from "../../../utils/ToastAlerta"
 
 function DeletarTema() {
 
@@ -20,9 +21,7 @@ function DeletarTema() {
     async function buscarPorId(id: string) {
         try {
             await buscar(`/temas/${id}`, setTema, {
-                headers: {
-                    'Authorization': token
-                }
+                headers: { 'Authorization': token }
             })
         } catch (error: any) {
             if (error.toString().includes('401')) {
@@ -33,7 +32,7 @@ function DeletarTema() {
 
     useEffect(() => {
         if (token === '') {
-            alert('Você precisa estar logado')
+            ToastAlerta('Você precisa estar logado', 'info')
             navigate('/')
         }
     }, [token])
@@ -49,18 +48,15 @@ function DeletarTema() {
 
         try {
             await deletar(`/temas/${id}`, {
-                headers: {
-                    'Authorization': token
-                }
+                headers: { 'Authorization': token }
             })
             
-            alert('Tema apagado com sucesso')
-
+            ToastAlerta('Tema apagado com sucesso!', 'sucesso')
         } catch (error: any) {
             if (error.toString().includes('401')) {
                 handleLogout()
             } else {
-                alert('Erro ao deletar o tema.')
+                ToastAlerta('Erro ao deletar o tema.', 'erro')
             }
         }
 
@@ -71,6 +67,7 @@ function DeletarTema() {
     function retornar() {
         navigate("/temas")
     }
+
     return (
         <div className='container w-1/3 mx-auto'>
             <h1 className='text-4xl text-center my-4'>Deletar tema</h1>
@@ -82,18 +79,22 @@ function DeletarTema() {
                 </header>
                 <p className='p-8 text-3xl bg-slate-200 h-full'>{tema.descricao}</p>
                 <div className="flex">
-                    <button className='text-slate-100 bg-red-400 hover:bg-red-600 w-full py-2'
-                    onClick={retornar}>
+                    <button 
+                        className='text-slate-100 bg-red-400 hover:bg-red-600 w-full py-2 cursor-pointer'
+                        onClick={retornar}
+                    >
                         Não
                     </button>
-                    <button className='w-full text-slate-100 bg-indigo-400 hover:bg-indigo-600 flex items-center justify-center'
-                    onClick={deletarTema}>
-                        {isLoading ? <ClipLoader color="#ffffff" size={24} /> 
-                        : <span>Sim</span>}
+                    <button 
+                        className='w-full text-slate-100 bg-indigo-400 hover:bg-indigo-600 flex items-center justify-center cursor-pointer'
+                        onClick={deletarTema}
+                    >
+                        {isLoading ? <ClipLoader color="#ffffff" size={24} /> : <span>Sim</span>}
                     </button>
                 </div>
             </div>
         </div>
     )
 }
+
 export default DeletarTema

@@ -1,16 +1,16 @@
-import React, { useContext, useEffect, useState, type ChangeEvent, type FormEvent, } from "react";
+import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners"
 import { AuthContext } from "../../../contexts/AuthContext";
 import type Tema from "../../../models/Tema";
 import { atualizar, buscar, cadastrar } from "../../../services/Service";
+import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 function FormTema() {
 
     const navigate = useNavigate();
 
     const [tema, setTema] = useState<Tema>({} as Tema)
-
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const { usuario, handleLogout } = useContext(AuthContext)
@@ -20,7 +20,6 @@ function FormTema() {
 
     async function buscarPorId(id: string) {
         try {
-            // CORRIGIDO: template string em vez de {{id}}
             await buscar(`/temas/${id}`, setTema, {
                 headers: { Authorization: token }
             })
@@ -33,7 +32,7 @@ function FormTema() {
 
     useEffect(() => {
         if (token === '') {
-            alert('Você precisa estar logado!')
+            ToastAlerta('Você precisa estar logado!', 'info')
             navigate('/')
         }
     }, [token])
@@ -64,12 +63,13 @@ function FormTema() {
                 await atualizar('/temas', tema, setTema, {
                     headers: { 'Authorization': token }
                 })
-                alert('O Tema foi atualizado com sucesso!')
-                retornar() // ← redireciona após atualizar
+                ToastAlerta('Tema atualizado com sucesso!', 'sucesso')
+                retornar()
             } catch (error: any) {
                 if (error.toString().includes('401')) {
                     handleLogout();
-                    alert('Erro ao autenticar o tema.');
+                } else {
+                    ToastAlerta('Erro ao atualizar o tema.', 'erro')
                 }
             }
         } else {
@@ -77,12 +77,13 @@ function FormTema() {
                 await cadastrar('/temas', tema, setTema, {
                     headers: { 'Authorization': token }
                 })
-                alert('O Tema foi cadastrado com sucesso!')
-                retornar() // ← redireciona após cadastrar
+                ToastAlerta('Tema cadastrado com sucesso!', 'sucesso')
+                retornar()
             } catch (error: any) {
                 if (error.toString().includes('401')) {
                     handleLogout();
-                    alert('Erro ao cadastrar o tema.');
+                } else {
+                    ToastAlerta('Erro ao cadastrar o tema.', 'erro')
                 }
             }
         }
@@ -102,8 +103,9 @@ function FormTema() {
                         placeholder="Descreva aqui seu tema"
                         name='descricao'
                         className="border-2 border-slate-700 rounded p-2"
-                        value={tema.descricao}
+                        value={tema.descricao || ''}
                         onChange={atualizarEstado}
+                        required
                     />
                 </div>
                 
@@ -111,14 +113,15 @@ function FormTema() {
                     <button
                         type="button"
                         onClick={retornar}
-                        className="rounded text-slate-100 bg-red-400 hover:bg-red-800 w-1/2 py-2 mx-auto flex justify-center"
+                        className="rounded text-slate-100 bg-red-400 hover:bg-red-800 w-1/2 py-2 mx-auto flex justify-center cursor-pointer"
                     >
                         Cancelar
                     </button>
                     
                     <button
                         type="submit"
-                        className="rounded text-slate-100 bg-indigo-400 hover:bg-indigo-800 w-1/2 py-2 mx-auto flex justify-center"
+                        className="rounded text-slate-100 bg-indigo-400 hover:bg-indigo-800 w-1/2 py-2 mx-auto flex justify-center cursor-pointer"
+                        disabled={isLoading}
                     >
                         {isLoading ? <ClipLoader color="#ffffff" size={24} /> 
                         : <span>{id === undefined ? 'Cadastrar' : 'Atualizar'}</span>}
@@ -129,4 +132,4 @@ function FormTema() {
     );
 }
 
-export default FormTema;
+export default FormTema
