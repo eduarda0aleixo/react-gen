@@ -24,7 +24,7 @@ export default function Navbar(){
             <Link to='/home' className="text-2xl font-bold">Blog Pessoal</Link>
             <div className="flex gap-4">
                 Postagens
-                Temas
+                <Link to='/temas' className='hover:underline'>Temas</Link>
                 Cadastrar tema
                 Perfil
                 <Link to='/login' onClick={logout} className='hover:underline'>
